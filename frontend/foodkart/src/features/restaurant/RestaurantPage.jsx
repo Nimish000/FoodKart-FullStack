@@ -1,361 +1,536 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  FaStar,
-  FaClock,
-  FaUtensils,
-  FaMapMarkerAlt,
-  FaPhone,
-  FaShoppingCart,
-} from "react-icons/fa";
+  Box,
+  Typography,
+  CardMedia,
+  Rating,
+  Chip,
+  Divider,
+  Button,
+  Grid,
+  Paper,
+  Tabs,
+  Tab,
+  IconButton,
+  Badge,
+  useTheme,
+} from "@mui/material";
+import {
+  LocationOn,
+  LocalOffer,
+  AccessTime,
+  ShoppingCart,
+  Remove,
+  Add,
+} from "@mui/icons-material";
 
-const RestaurantPage = ({ match }) => {
-  const [restaurant, setRestaurant] = useState(null);
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [cart, setCart] = useState([]);
-  const [quantity, setQuantity] = useState(1);
+// Sample restaurant data
+const restaurant = {
+  id: 1,
+  name: "Taj Mahal Restaurant",
+  rating: 4.7,
+  reviewCount: 342,
+  address: "123 Main Street, City Center, Mumbai 400001",
+  cuisines: ["North Indian", "Mughlai", "Biryani"],
+  deliveryTime: "30-45 min",
+  minOrder: "₹200",
+  offers: ["20% off on orders above ₹500", "Free delivery on first order"],
+  image: "https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg",
 
-  // Mock data - replace with API call in real implementation
-  useEffect(() => {
-    const mockRestaurants = [
+  menu: {
+    Starters: [
       {
-        id: "1",
-        name: "Spice Route",
-        cuisine: "Indian",
-        rating: 4.5,
-        deliveryTime: "25-35 min",
-        minOrder: 150,
-        costForTwo: 400,
-        address: "123 Food Street, Mumbai",
-        phone: "+91 9876543210",
-        image: "https://placehold.co/800x500?text=Spice+Route",
-        categories: [
-          "Starters",
-          "Main Course",
-          "Breads",
-          "Desserts",
-          "Beverages",
-        ],
-        menu: {
-          Starters: [
-            {
-              id: 1,
-              name: "Paneer Tikka",
-              description: "Cottage cheese marinated in spices and grilled",
-              price: 220,
-              veg: true,
-            },
-            {
-              id: 2,
-              name: "Chicken 65",
-              description: "Spicy deep fried chicken appetizer",
-              price: 260,
-              veg: false,
-            },
-            {
-              id: 3,
-              name: "Gobi Manchurian",
-              description: "Crispy cauliflower in manchurian sauce",
-              price: 180,
-              veg: true,
-            },
-          ],
-          "Main Course": [
-            {
-              id: 4,
-              name: "Butter Chicken",
-              description: "Tandoori chicken in rich tomato gravy",
-              price: 320,
-              veg: false,
-            },
-            {
-              id: 5,
-              name: "Paneer Butter Masala",
-              description: "Cottage cheese in creamy tomato gravy",
-              price: 280,
-              veg: true,
-            },
-            {
-              id: 6,
-              name: "Dal Makhani",
-              description: "Black lentils slow cooked with butter",
-              price: 240,
-              veg: true,
-            },
-          ],
-          Breads: [
-            { id: 7, name: "Garlic Naan", price: 60, veg: true },
-            { id: 8, name: "Butter Roti", price: 30, veg: true },
-            { id: 9, name: "Tandoori Paratha", price: 50, veg: true },
-          ],
-          Desserts: [
-            {
-              id: 10,
-              name: "Gulab Jamun",
-              description: "Deep fried milk balls in sugar syrup",
-              price: 120,
-              veg: true,
-            },
-            {
-              id: 11,
-              name: "Kheer",
-              description: "Rice pudding with dry fruits",
-              price: 100,
-              veg: true,
-            },
-          ],
-          Beverages: [
-            { id: 12, name: "Masala Chai", price: 50, veg: true },
-            { id: 13, name: "Mango Lassi", price: 80, veg: true },
-          ],
-        },
+        id: 1,
+        name: "Veg Spring Rolls",
+        description: "Crispy vegetable rolls with schezwan sauce",
+        price: 220,
+        veg: true,
       },
-    ];
+      {
+        id: 2,
+        name: "Chicken Tikka",
+        description: "Tandoori roasted chicken pieces",
+        price: 280,
+        veg: false,
+      },
+    ],
+    Breads: [
+      {
+        id: 3,
+        name: "Butter Naan",
+        description: "Soft bread brushed with butter",
+        price: 60,
+        veg: true,
+      },
+      {
+        id: 4,
+        name: "Garlic Naan",
+        description: "Naan stuffed with garlic butter",
+        price: 80,
+        veg: true,
+      },
+    ],
+    "Main Course": [
+      {
+        id: 5,
+        name: "Paneer Butter Masala",
+        description: "Cottage cheese in rich tomato gravy",
+        price: 320,
+        veg: true,
+      },
+      {
+        id: 6,
+        name: "Chicken Biryani",
+        description: "Aromatic rice with chicken pieces",
+        price: 380,
+        veg: false,
+      },
+    ],
+    Desserts: [
+      {
+        id: 7,
+        name: "Gulab Jamun",
+        description: "2 pieces of fried milk balls in sugar syrup",
+        price: 120,
+        veg: true,
+      },
+    ],
+  },
+};
 
-    const foundRestaurant = mockRestaurants.map((prev) => prev);
-
-    // const foundRestaurant = mockRestaurants.find(
-    //   (r) => r.id === match.params.id
-    // );
-    console.log(foundRestaurant);
-    setRestaurant(foundRestaurant);
-    console.log(restaurant);
-  }, []);
+function RestaurantPage() {
+  const theme = useTheme();
+  const [activeCategory, setActiveCategory] = useState("Starters");
+  const [cart, setCart] = useState([]);
 
   const addToCart = (item) => {
-    setCart([...cart, { ...item, quantity }]);
-    alert(`${item.name} added to cart!`);
-    setQuantity(1);
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+      if (existingItem) {
+        return prevCart.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem
+        );
+      } else {
+        return [...prevCart, { ...item, quantity: 1 }];
+      }
+    });
   };
 
-  if (!restaurant) {
-    return <div className="text-center py-20">Loading...</div>;
-  }
+  const removeFromCart = (itemId) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.id === itemId);
+      if (existingItem.quantity > 1) {
+        return prevCart.map((item) =>
+          item.id === itemId ? { ...item, quantity: item.quantity - 1 } : item
+        );
+      } else {
+        return prevCart.filter((item) => item.id !== itemId);
+      }
+    });
+  };
+
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   return (
-    <div className="bg-gray-900 text-gray-100 min-h-screen">
-      {/* Restaurant Hero Section */}
-      <div className="relative">
-        <img
-          src={restaurant.image}
-          alt={`${restaurant.name} restaurant`}
-          className="w-full h-64 md:h-96 object-cover"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 to-transparent p-6">
-          <div className="container mx-auto">
-            <h1 className="text-3xl md:text-4xl font-bold">
-              {restaurant.name}
-            </h1>
-            <div className="flex flex-wrap items-center mt-2 gap-4">
-              <div className="flex items-center">
-                <FaStar className="text-amber-500 mr-1" />
-                <span>{restaurant.rating}</span>
-              </div>
-              <div className="flex items-center">
-                <FaUtensils className="text-gray-400 mr-1" />
-                <span>{restaurant.cuisine}</span>
-              </div>
-              <div className="flex items-center">
-                <FaClock className="text-gray-400 mr-1" />
-                <span>{restaurant.deliveryTime}</span>
-              </div>
-              <div className="flex items-center">
-                <span>₹{restaurant.costForTwo} for two</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <Box sx={{ backgroundColor: theme.palette.background.default }}>
+      {/* Restaurant Header */}
+      <CardMedia
+        component="img"
+        image={restaurant.image}
+        alt={restaurant.name}
+        sx={{ objectFit: "cover", height: "40vh", width: "80vw" }}
+      />
 
-      {/* Restaurant Info & Categories */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Restaurant Details */}
-          <div className="md:col-span-2">
-            <div className="bg-gray-800 rounded-lg p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4">About the restaurant</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-start">
-                  <FaMapMarkerAlt className="text-amber-500 mt-1 mr-2" />
-                  <div>
-                    <h3 className="font-semibold">Address</h3>
-                    <p>{restaurant.address}</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <FaClock className="text-amber-500 mt-1 mr-2" />
-                  <div>
-                    <h3 className="font-semibold">Average Delivery Time</h3>
-                    <p>{restaurant.deliveryTime}</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="text-amber-500 mr-2">₹</div>
-                  <div>
-                    <h3 className="font-semibold">Minimum Order</h3>
-                    <p>₹{restaurant.minOrder}</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <FaPhone className="text-amber-500 mt-1 mr-2" />
-                  <div>
-                    <h3 className="font-semibold">Call</h3>
-                    <p>{restaurant.phone}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <Box
+        sx={{
+          p: 3,
+          width: "80vw",
+          mx: "auto",
+          backgroundColor: theme.palette.background.paper,
+        }}
+      >
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={8} sx={{ width: { md: "65%", xs: "90vw" } }}>
+            {/* Restaurant Info */}
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+                gutterBottom
+                color={theme.palette.secondary.contrastText}
+              >
+                {restaurant.name}
+              </Typography>
+
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <Rating value={restaurant.rating} precision={0.1} readOnly />
+                <Typography
+                  variant="body1"
+                  sx={{ ml: 1, color: theme.palette.secondary.contrastText }}
+                >
+                  {restaurant.rating} ({restaurant.reviewCount} ratings)
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <LocationOn
+                  sx={{ color: theme.palette.secondary.contrastText }}
+                />
+                <Typography
+                  sx={{ ml: 1, color: theme.palette.secondary.contrastText }}
+                >
+                  {restaurant.address}
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <AccessTime
+                  sx={{ color: theme.palette.secondary.contrastText }}
+                />
+                <Typography
+                  sx={{ ml: 1, color: theme.palette.secondary.contrastText }}
+                >
+                  Delivery in {restaurant.deliveryTime}
+                </Typography>
+                <Typography
+                  sx={{ ml: 2, color: theme.palette.secondary.contrastText }}
+                >
+                  • Min order: {restaurant.minOrder}
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                {restaurant.cuisines.map((cuisine, index) => (
+                  <Chip
+                    key={index}
+                    label={cuisine}
+                    color={theme.palette.primary.contrastText}
+                    variant="outlined"
+                  />
+                ))}
+              </Box>
+
+              {restaurant.offers && restaurant.offers.length > 0 && (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    mb: 3,
+                    bgcolor: theme.palette.background.paper,
+                    borderRadius: 2,
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    gutterBottom
+                    color={theme.palette.secondary.contrastText}
+                  >
+                    <LocalOffer
+                      sx={{
+                        color: theme.palette.secondary.contrastText,
+                        verticalAlign: "middle",
+                        mr: 1,
+                      }}
+                    />
+                    Offers
+                  </Typography>
+                  <ul>
+                    {restaurant.offers.map((offer, index) => (
+                      <li key={index}>
+                        <Typography
+                          color={theme.palette.secondary.contrastText}
+                        >
+                          {offer}
+                        </Typography>
+                      </li>
+                    ))}
+                  </ul>
+                </Paper>
+              )}
+            </Box>
 
             {/* Menu Categories */}
-            <div className="sticky top-0 bg-gray-900 py-4 z-10">
-              <div className="flex overflow-x-auto pb-2 space-x-2">
-                <button
-                  onClick={() => setActiveCategory("all")}
-                  className={`px-4 py-2 rounded-full whitespace-nowrap ${
-                    activeCategory === "all"
-                      ? "bg-amber-600 text-white"
-                      : "bg-gray-800"
-                  }`}
-                >
-                  All Items
-                </button>
-                {restaurant[0].categories.map((category) => (
-                  <button
+            <Box sx={{ borderBottom: 1, borderColor: "transparent" }}>
+              <Tabs
+                value={activeCategory}
+                onChange={(e, newValue) => setActiveCategory(newValue)}
+                variant="scrollable"
+                scrollButtons="auto"
+                sx={{
+                  bgcolor: theme.palette.background.paper,
+                }}
+              >
+                {Object.keys(restaurant.menu).map((category) => (
+                  <Tab
                     key={category}
-                    onClick={() => setActiveCategory(category)}
-                    className={`px-4 py-2 rounded-full whitespace-nowrap ${
-                      activeCategory === category
-                        ? "bg-amber-600 text-white"
-                        : "bg-gray-800"
-                    }`}
-                  >
-                    {category}
-                  </button>
+                    label={category}
+                    value={category}
+                    sx={{
+                      color:
+                        activeCategory === category
+                          ? theme.palette.secondary.contrastText
+                          : "grey",
+                      borderBottom:
+                        activeCategory === category
+                          ? `2px solid ${theme.palette.secondary.main}`
+                          : "none",
+                      "&.Mui-selected": {
+                        color: theme.palette.secondary.contrastText, // Active tab color
+                      },
+                      // "&:hover": {
+                      //   color: theme.palette.secondary.main,
+                      // },
+                    }}
+                  />
                 ))}
-              </div>
-            </div>
+              </Tabs>
+            </Box>
 
             {/* Menu Items */}
-            <div className="mt-6 space-y-6">
-              {Object.entries(restaurant[0].menu)
-                .filter(
-                  ([category]) =>
-                    activeCategory === "all" || activeCategory === category
-                )
-                .map(([category, items]) => (
-                  <div key={category}>
-                    <h3 className="text-xl font-bold mb-4">{category}</h3>
-                    <div className="space-y-4">
-                      {items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="bg-gray-800 rounded-lg p-4 flex justify-between items-start"
+            <Box mt={2}>
+              {restaurant.menu[activeCategory].map((item) => (
+                <Paper
+                  key={item.id}
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    mb: 2,
+                    borderRadius: 2,
+                    bgcolor: theme.palette.background.paper,
+                    width: { xs: "100%", md: "100%" },
+                  }}
+                >
+                  <Grid container spacing={2}>
+                    <Grid item xs={8} sx={{ width: { md: "40%", xs: "60%" } }}>
+                      {item.veg ? (
+                        <Typography variant="caption" color="green">
+                          🟢 VEG
+                        </Typography>
+                      ) : (
+                        <Typography variant="caption" color="red">
+                          🔴 NON-VEG
+                        </Typography>
+                      )}
+                      <Typography
+                        variant="h6"
+                        fontWeight="bold"
+                        color={theme.palette.secondary.contrastText}
+                      >
+                        {item.name}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color={theme.palette.secondary.contrastText}
+                      >
+                        {item.description}
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        mt={1}
+                        color={theme.palette.secondary.contrastText}
+                      >
+                        ₹{item.price}
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={4}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                      }}
+                    >
+                      {cart.some((cartItem) => cartItem.id === item.id) ? (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            bgcolor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
+                            borderRadius: 2,
+                            p: "4px 8px",
+                          }}
                         >
-                          <div className="flex-1">
-                            <div className="flex items-start">
-                              {item.veg !== undefined && (
-                                <div
-                                  className={`border rounded-full w-4 h-4 mt-1 mr-2 ${
-                                    item.veg
-                                      ? "border-green-500"
-                                      : "border-red-500"
-                                  }`}
-                                >
-                                  <div
-                                    className={`rounded-full w-2 h-2 mx-auto mt-0.5 ${
-                                      item.veg ? "bg-green-500" : "bg-red-500"
-                                    }`}
-                                  ></div>
-                                </div>
-                              )}
-                              <div>
-                                <h4 className="font-bold">{item.name}</h4>
-                                {item.description && (
-                                  <p className="text-gray-400 text-sm mt-1">
-                                    {item.description}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="font-bold mr-4">
-                              ₹{item.price}
-                            </span>
-                            <button
-                              onClick={() => addToCart(item)}
-                              className="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded-full flex items-center"
-                            >
-                              <FaShoppingCart className="mr-2" />
-                              Add
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
+                          <IconButton
+                            size="small"
+                            sx={{ color: theme.palette.secondary.contrastText }}
+                            onClick={() => removeFromCart(item.id)}
+                          >
+                            <Remove fontSize="small" />
+                          </IconButton>
+                          <Typography mx={1}>
+                            {
+                              cart.find((cartItem) => cartItem.id === item.id)
+                                .quantity
+                            }
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            sx={{ color: theme.palette.secondary.contrastText }}
+                            onClick={() => addToCart(item)}
+                          >
+                            <Add
+                              sx={{
+                                color: theme.palette.secondary.contrastText,
+                              }}
+                              fontSize="small"
+                            />
+                          </IconButton>
+                        </Box>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          onClick={() => addToCart(item)}
+                          startIcon={<Add />}
+                          sx={{
+                            color: theme.palette.primary.contrastText,
+                            borderColor: theme.palette.primary.contrastText,
+                          }}
+                        >
+                          Add
+                        </Button>
+                      )}
+                    </Grid>
+                  </Grid>
+                </Paper>
+              ))}
+            </Box>
+          </Grid>
 
-          {/* Cart Summary (Desktop) */}
-          <div className="hidden md:block">
-            <div className="sticky top-24 bg-gray-800 rounded-lg p-6">
-              <h2 className="text-xl font-bold mb-4">Your Order</h2>
+          {/* Cart Sidebar */}
+          <Grid item xs={12} md={4}>
+            <Paper
+              elevation={3}
+              sx={{
+                width: { md: "20vw", xs: "60vw" },
+                p: 2,
+                position: "relative",
+                top: "20px",
+                bgcolor: theme.palette.background.paper,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color={theme.palette.secondary.contrastText}
+                >
+                  Your Order
+                </Typography>
+                <Badge badgeContent={totalItems} color="primary">
+                  <ShoppingCart color="action" />
+                </Badge>
+              </Box>
+
               {cart.length === 0 ? (
-                <p className="text-gray-400">Your cart is empty</p>
+                <Typography
+                  textAlign="center"
+                  color={theme.palette.secondary.contrastText}
+                  py={2}
+                >
+                  Your cart is empty
+                </Typography>
               ) : (
                 <>
-                  <div className="space-y-4 mb-6">
-                    {cart.map((item, index) => (
-                      <div key={index} className="flex justify-between">
-                        <div>
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-gray-400 text-sm block">
-                            × {item.quantity}
-                          </span>
-                        </div>
-                        <span>₹{item.price * item.quantity}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="border-t border-gray-700 pt-4 mb-6">
-                    <div className="flex justify-between font-bold">
-                      <span>Subtotal</span>
-                      <span>
-                        ₹
-                        {cart.reduce(
-                          (sum, item) => sum + item.price * item.quantity,
-                          0
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                  <button className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-bold">
+                  {cart.map((item) => (
+                    <Box
+                      key={item.id}
+                      sx={{
+                        mb: 2,
+                        pb: 2,
+                        borderBottom: 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography
+                          fontWeight="bold"
+                          color={theme.palette.secondary.contrastText}
+                        >
+                          {item.name} × {item.quantity}
+                        </Typography>
+                        <Typography
+                          color={theme.palette.secondary.contrastText}
+                        >
+                          ₹{item.price * item.quantity}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ mt: 1 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => removeFromCart(item.id)}
+                        >
+                          <Remove fontSize="small" />
+                        </IconButton>
+                        <Typography variant="body2" component="span" mx={1}>
+                          {item.quantity}
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() => addToCart(item)}
+                        >
+                          <Add fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  ))}
+
+                  <Divider sx={{ my: 2 }} />
+
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      color={theme.palette.secondary.contrastText}
+                    >
+                      Subtotal
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      color={theme.palette.secondary.contrastText}
+                    >
+                      ₹{subtotal}
+                    </Typography>
+                  </Box>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    sx={{ mt: 3 }}
+                    disabled={cart.length === 0}
+                  >
                     Proceed to Checkout
-                  </button>
+                  </Button>
                 </>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Cart Button */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-4">
-        <button className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-bold flex justify-center items-center">
-          <FaShoppingCart className="mr-2" />
-          {cart.length > 0 ? (
-            <span>
-              View Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)}{" "}
-              items)
-            </span>
-          ) : (
-            <span>Your Cart is Empty</span>
-          )}
-        </button>
-      </div>
-    </div>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
-};
+}
 
 export default RestaurantPage;

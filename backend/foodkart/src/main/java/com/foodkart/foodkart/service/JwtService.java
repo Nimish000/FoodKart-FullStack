@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,10 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-private String secretKey="";
+
+    private String secretKey="";
 
     public JwtService() {
-        System.out.print("working");
         try{
             KeyGenerator keyGen=KeyGenerator.getInstance("HmacSHA256");
             SecretKey sk=keyGen.generateKey();
@@ -36,10 +37,7 @@ private String secretKey="";
 
     public String generateToken(String username) {
         Map<String,Object> claims=new HashMap<>();
-//        return "zxyvwgdvsvdh";
-
 try {
-
     return Jwts.builder()
             .claims()
             .add(claims)
@@ -51,7 +49,6 @@ try {
             .compact();
 }catch(Exception e){
     return "Error -> "+e;
-
         }
     }
 

@@ -31,7 +31,7 @@ public class SecurityConfig {
         return http
                 .csrf(customizer->customizer.disable())
                 .authorizeHttpRequests(request->request
-                        .requestMatchers("api/register","api/login")
+                        .requestMatchers("api/register","api/login","api/send-otp","api/verify-otp")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
@@ -46,7 +46,7 @@ public class SecurityConfig {
         // it is for verify user from db
         // create userDetailsService
         DaoAuthenticationProvider provider=new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(15));
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(10));
         return provider;
     }
 

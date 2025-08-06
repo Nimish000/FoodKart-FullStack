@@ -16,13 +16,17 @@ public class User {
     private int id;
 
     @Column(nullable = false, unique = true)
+    private String mobile;
+    @Column(nullable = true, unique = true)
     private String username;
-    @Column(nullable = false)
+
     private String password;
 
     private String name;
-@Column(unique = true)
-    private String mobile;
+
+
     private String profileImage;
+
+    private String role;
 
 }

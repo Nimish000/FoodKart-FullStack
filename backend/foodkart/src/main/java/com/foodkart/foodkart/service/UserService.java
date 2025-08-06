@@ -21,7 +21,7 @@ public class UserService {
     AuthenticationManager authManager;
     @Autowired
      JwtService jwtService;
-    private BCryptPasswordEncoder encoder=new BCryptPasswordEncoder(15);
+    private BCryptPasswordEncoder encoder=new BCryptPasswordEncoder(10);
 
     public List<User> getUser() {
         return repo.findAll();
@@ -36,20 +36,13 @@ public class UserService {
 
         Authentication authentication=authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
         if (authentication.isAuthenticated()){
-            String jwt=jwtService.generateToken(user.getUsername());
+            return jwtService.generateToken(user.getUsername());
 
-if(jwt.isEmpty()){
-    return "Jwt error";
-}
-            return jwt;
         }else{
             return "Fail";
         }
 
-//         User user1=repo.findByUsername(user.getUsername());
-//         if(Objects.equals(user1.getPassword(), user.getPassword())){
-//             return "Success";
-//         }
-//         return jwtService.generateToken(user.getUsername());
     }
+
+
 }
