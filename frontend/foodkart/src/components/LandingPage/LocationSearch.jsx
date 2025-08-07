@@ -15,6 +15,7 @@ import {
   ArrowDropDown,
   Close,
 } from "@mui/icons-material";
+const mapApiKey = import.meta.env.VITE_MAP_API_KEY;
 
 const LocationSearch = () => {
   const { address, requestLocation, updateLocation } = useLocation();
@@ -31,7 +32,7 @@ const LocationSearch = () => {
   useEffect(() => {
     console.log("LocationSearch component mounted" + address);
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBrp_Uvj09nLKoGJuCpgNtKI76sgm0ceGo&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${mapApiKey}&libraries=places`;
 
     script.async = true;
     script.defer = true;

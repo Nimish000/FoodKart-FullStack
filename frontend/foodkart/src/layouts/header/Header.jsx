@@ -18,6 +18,7 @@ import {
 } from "@mui/icons-material";
 import { useLocation } from "../../context/LocationContext";
 import "./Header.css"; // Import CSS for animations
+const mapApiKey = import.meta.env.VITE_MAP_API_KEY;
 
 function Header() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ function Header() {
   useEffect(() => {
     console.log("on start address" + address);
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBrp_Uvj09nLKoGJuCpgNtKI76sgm0ceGo&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${mapApiKey}}&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => {

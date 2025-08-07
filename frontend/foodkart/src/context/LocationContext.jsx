@@ -1,5 +1,6 @@
 // context/LocationContext.js
 import { createContext, useState, useEffect, useContext } from "react";
+const mapApiKey = import.meta.env.VITE_MAP_API_KEY;
 
 export const LocationContext = createContext({
   location: { latitude: 0, longitude: 0 },
@@ -17,11 +18,10 @@ export const LocationProvider = ({ children }) => {
   );
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const fetchAddress = async (lat, lng) => {
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyBrp_Uvj09nLKoGJuCpgNtKI76sgm0ceGo`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${mapApiKey}`
       );
       if (!response.ok) throw new Error("Failed to fetch address");
       const data = await response.json();
