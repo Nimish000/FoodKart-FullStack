@@ -19,9 +19,9 @@ import { postApiCall } from "../../apiController/ApiController";
 
 const AuthSlideModal = ({ open, onClose, isLogin, toggleAuthMode }) => {
   const navigate = useNavigate();
-  const [phone, setPhone] = useState("+919999600320");
+  const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
-  const [isOtpSent, setIsOtpSent] = useState(true);
+  const [isOtpSent, setIsOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -97,6 +97,7 @@ const AuthSlideModal = ({ open, onClose, isLogin, toggleAuthMode }) => {
     <Dialog
       open={open}
       TransitionComponent={Slide}
+      slots={Slide}
       onClose={onClose}
       fullWidth
       maxWidth="sm"
@@ -214,22 +215,6 @@ const AuthSlideModal = ({ open, onClose, isLogin, toggleAuthMode }) => {
             </Button>
           </div>
         )}
-
-        <Box textAlign="center" mt={2}>
-          <Button
-            onClick={() => {
-              setIsOtpSent(false);
-              setOtp("");
-              setError(null);
-              toggleAuthMode();
-            }}
-            sx={{ textTransform: "none", color: "white" }}
-          >
-            {isLogin
-              ? "Don't have an account? Sign Up"
-              : "Already have an account? Login"}
-          </Button>
-        </Box>
       </DialogContent>
     </Dialog>
   );

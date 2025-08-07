@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from "react";
+// context/LocationContext.js
+import { createContext, useState, useEffect, useContext } from "react";
 
 export const LocationContext = createContext({
   location: { latitude: 0, longitude: 0 },
@@ -6,84 +7,76 @@ export const LocationContext = createContext({
   error: null,
   loading: false,
   requestLocation: () => {},
-  updateLocation: (lat, lng) => {},
+  updateLocation: (lat, lng, address) => {},
 });
 
 export const LocationProvider = ({ children }) => {
   const [location, setLocation] = useState({ latitude: 0, longitude: 0 });
-  const [address, setAddress] = useState(null);
+  const [address, setAddress] = useState(
+    localStorage.getItem("address") || null
+  );
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const requestLocation = () => {
-    if ("geolocation" in navigator) {
-      setLoading(true);
-      setError(null);
+  const fetchAddress = async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyBrp_Uvj09nLKoGJuCpgNtKI76sgm0ceGo`
+      );
+      if (!response.ok) throw new Error("Failed to fetch address");
+      const data = await response.json();
+      setAddress(data.results[0]?.formatted_address || "Unknown location");
+      localStorage.setItem("address", data.results[0]?.formatted_address);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
+  const requestLocation = () => {
+    if ("geolocation" in navigator && !address) {
+      setLoading(true);
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          // console.log(latitude, longitude);
           setLocation({ latitude, longitude });
-          // fetchAddress(latitude, longitude); // Fetch address after getting location
+          await fetchAddress(latitude, longitude);
           setLoading(false);
         },
         (err) => {
           setError(err.message);
           setLoading(false);
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 1000 }
+        { enableHighAccuracy: true }
       );
     } else {
-      setError("Geolocation is not supported by your browser");
+      setError("Geolocation is not supported");
     }
   };
 
-  const fetchAddress = async (lat, lng) => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch address");
-      }
-      const data = await response.json();
-      console.log(data);
-      setAddress(data.display_name); // Set the address from the response
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateLocation = (lat, lng) => {
+  const updateLocation = (lat, lng, newAddress) => {
     setLocation({ latitude: lat, longitude: lng });
-    fetchAddress(lat, lng); // Fetch address when location is updated
+    setAddress(newAddress || address);
+    localStorage.setItem("address", newAddress || address);
   };
 
-  // Optionally request location when provider mounts
   useEffect(() => {
-    // Remove or comment this if you want manual control
     requestLocation();
-  }, []);
-
-  const value = {
-    location,
-    address,
-    error,
-    loading,
-    requestLocation,
-    updateLocation,
-  };
+  }, []); // Get current location on mount
 
   return (
-    <LocationContext.Provider value={value}>
+    <LocationContext.Provider
+      value={{
+        location,
+        address,
+        error,
+        loading,
+        requestLocation,
+        updateLocation,
+      }}
+    >
       {children}
     </LocationContext.Provider>
   );
 };
 
-// Custom hook for easy access
-export const useLocation = () => React.useContext(LocationContext);
+export const useLocation = () => useContext(LocationContext);

@@ -12,6 +12,7 @@ import RestaurantPage from "../features/restaurant/RestaurantPage";
 import MainStruct from "../MainStruct";
 import HomePage from "../features/home/HomePage";
 import SearchPage from "../features/search/SearchPage";
+import AccountPage from "../features/account/AccountPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
           <Route path="restaurant" element={<RestaurantPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="about" element={<AboutPage />} />
+          <Route path="account" element={<AccountPage />} />
         </Route>
       </Route>
       {/* for admin */}

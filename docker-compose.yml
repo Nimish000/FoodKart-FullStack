@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:13
+    container_name: foodkart-db
+    environment:
+      POSTGRES_DB: Foodkart
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Nimish@123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  backend:
+  
+    build:
+      context: ./backend/foodkart
+      dockerfile: Dockerfile
+    container_name: foodkart-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/Foodkart
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Nimish@123
+    depends_on:
+      - db
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend/foodkart
+      dockerfile: Dockerfile
+    container_name: foodkart-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/foodkart:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    environment:
+      CHOKIDAR_USEPOLLING: "true"  # Enables watching for file changes (especially needed for Windows)
+    stdin_open: true
+    tty: true
+    restart: on-failure
+    command: npm run dev
+
+volumes:
+  postgres_data:

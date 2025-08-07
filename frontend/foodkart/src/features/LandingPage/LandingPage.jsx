@@ -25,6 +25,8 @@ import {
 } from "@mui/icons-material";
 import LandingPageFooter from "../../layouts/footer/LandingPageFooter";
 import AuthSlideModal from "../../components/LandingPage/AuthSliderModal";
+import { useLocation } from "../../context/LocationContext";
+import LocationSearch from "../../components/LandingPage/LocationSearch";
 
 const features = [
   {
@@ -53,6 +55,8 @@ const features = [
 
 function LandingPage() {
   const theme = useTheme();
+  const { location, address, requestLocation } = useLocation();
+
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isLoginView, setIsLoginView] = useState(true);
@@ -82,7 +86,6 @@ function LandingPage() {
         }}
       >
         {" "}
-        <div id="recaptcha-container"></div>
         <Container maxWidth="lg">
           <Box
             sx={{
@@ -101,25 +104,26 @@ function LandingPage() {
               </Box>
             </Typography>
             <Box>
-              <Button
+              {/* <Button
                 variant="text"
                 onClick={() => handleAuthModalOpen(true)}
                 sx={{ color: "white", mr: 2 }}
               >
                 Login
-              </Button>
+              </Button> */}
               <Button
-                onClick={() => handleAuthModalOpen(false)}
+                onClick={() => handleAuthModalOpen(true)}
                 variant="contained"
                 color="secondary"
               >
-                Sign Up
+                Login
               </Button>
             </Box>
           </Box>
 
           <Grid container spacing={6} alignItems="center">
             <Grid item xs={12} md={6}>
+              {/* heading  */}
               <Typography
                 variant={isMobile ? "h3" : "h2"}
                 fontWeight="bold"
@@ -135,6 +139,8 @@ function LandingPage() {
                 compromise.
               </Typography>
 
+              {/* Location  */}
+
               <Box
                 sx={{
                   display: "flex",
@@ -143,40 +149,7 @@ function LandingPage() {
                   flexDirection: isMobile ? "column" : "row",
                 }}
               >
-                <FormControl
-                  fullWidth
-                  sx={{
-                    bgcolor: "background.paper",
-                    borderRadius: 1,
-                  }}
-                >
-                  <InputLabel>Enter your address</InputLabel>
-                  <Select
-                    label="Enter your address"
-                    startAdornment={<Place sx={{ mr: 1 }} />}
-                    sx={{
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        border: "none",
-                      },
-                      "& .MuiInputLabel-root": {
-                        color: "white",
-                      },
-                      "& .MuiInputLabel-root.Mui-focused": {
-                        color: "white",
-                      },
-                      "& .MuiSvgIcon-root": {
-                        color: "white",
-                      },
-                      "& .MuiSelect-select": {
-                        color: "white",
-                      },
-                    }}
-                  >
-                    <MenuItem value="current">Use current location</MenuItem>
-                    <MenuItem value="home">Home Address</MenuItem>
-                    <MenuItem value="work">Work Address</MenuItem>
-                  </Select>
-                </FormControl>
+                <LocationSearch />
                 <Button
                   variant="contained"
                   color="secondary"
@@ -189,6 +162,7 @@ function LandingPage() {
                   Find Restaurants
                 </Button>
               </Box>
+              {/* location ended */}
             </Grid>
           </Grid>
         </Container>
